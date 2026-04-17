@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TallerTrack</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg: #141414;
+      --bg2: #1e1e1e;
+      --bg3: #2a2a2a;
+      --accent: #F59E0B;
+      --accent2: #D97706;
+      --text: #F5F5F5;
+      --text2: #A0A0A0;
+      --border: #333;
+      --success: #10B981;
+      --error: #EF4444;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'IBM Plex Mono', monospace;
+      min-height: 100vh;
+    }
+    .header {
+      background: var(--bg2);
+      border-bottom: 2px solid var(--accent);
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 60px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .logo {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 24px;
+      color: var(--accent);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+    .logo span { color: var(--text2); font-weight: 400; }
+    .nav { display: flex; gap: 4px; }
+    .nav-btn {
+      background: none;
+      border: none;
+      color: var(--text2);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 600;
+      font-size: 14px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 8px 16px;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+    .nav-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .nav-btn:hover { color: var(--text); }
+    .main { max-width: 600px; margin: 0 auto; padding: 24px 20px; }
+    .view { display: none; }
+    .view.active { display: block; }
+
+    /* Upload */
+    .upload-zone {
+      border: 2px dashed var(--border);
+      border-radius: 8px;
+      padding: 60px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: var(--bg2);
+      position: relative;
+    }
+    .upload-zone:hover, .upload-zone.drag-over {
+      border-color: var(--accent);
+      background: rgba(245,158,11,0.05);
+    }
+    .upload-zone input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+    .upload-icon { font-size: 48px; margin-bottom: 16px; }
+    .upload-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      letter-spacing: 1px;
+    }
+    .upload-sub { font-size: 12px; color: var(--text2); line-height: 1.6; }
+    .manual-btn {
+      display: inline-block;
+      margin-top: 20px;
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text2);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 600;
+      font-size: 13px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 8px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      position: relative;
+      z-index: 2;
+      transition: all 0.2s;
+    }
+    .manual-btn:hover { border-color: var(--text2); color: var(--text); }
+
+    /* Loading */
+    .loading-state { text-align: center; padding: 60px 20px; }
+    .spinner {
+      width: 48px;
+      height: 48px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 20px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 1px;
+    }
+    .loading-sub { font-size: 11px; color: var(--text2); margin-top: 8px; }
+
+    /* Form */
+    .form-section { margin-bottom: 24px; }
+    .section-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text2);
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .field { margin-bottom: 16px; }
+    .field label {
+      display: block;
+      font-size: 11px;
+      color: var(--text2);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .field input, .field select, .field textarea {
+      width: 100%;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 14px;
+      padding: 10px 12px;
+      transition: border-color 0.2s;
+      outline: none;
+    }
+    .field input:focus, .field select:focus, .field textarea:focus {
+      border-color: var(--accent);
+    }
+    .field textarea { resize: vertical; min-height: 80px; }
+    .field select option { background: var(--bg2); }
+    .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .ai-badge {
+      display: inline-block;
+      background: rgba(245,158,11,0.15);
+      border: 1px solid rgba(245,158,11,0.3);
+      color: var(--accent);
+      font-size: 9px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 2px 6px;
+      border-radius: 3px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    /* Buttons */
+    .btn-primary {
+      background: var(--accent);
+      color: #000;
+      border: none;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 14px 32px;
+      border-radius: 4px;
+      cursor: pointer;
+      width: 100%;
+      transition: background 0.2s;
+    }
+    .btn-primary:hover { background: var(--accent2); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-secondary {
+      background: none;
+      color: var(--text2);
+      border: 1px solid var(--border);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 600;
+      font-size: 14px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 10px 24px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-secondary:hover { border-color: var(--text2); color: var(--text); }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--success);
+      color: #000;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: 1px;
+      padding: 12px 24px;
+      border-radius: 4px;
+      transition: transform 0.3s;
+      z-index: 1000;
+      white-space: nowrap;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast.error { background: var(--error); color: #fff; }
+
+    /* Dashboard */
+    .dashboard-header { margin-bottom: 24px; }
+    .month-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 32px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+    .month-label span { color: var(--accent); }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .stat-card:hover { border-color: var(--accent); }
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--accent);
+    }
+    .stat-name {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+    .stat-label { font-size: 10px; color: var(--text2); letter-spacing: 1px; text-transform: uppercase; }
+    .stat-value {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .stat-value.secondary { font-size: 18px; color: var(--text); }
+    .chart-container {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+    .chart-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text2);
+      margin-bottom: 16px;
+    }
+    .partes-list {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+    .partes-header {
+      display: grid;
+      grid-template-columns: 100px 1fr 90px 60px;
+      gap: 8px;
+      padding: 10px 16px;
+      background: var(--bg3);
+      font-size: 10px;
+      color: var(--text2);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .parte-row {
+      display: grid;
+      grid-template-columns: 100px 1fr 90px 60px;
+      gap: 8px;
+      padding: 12px 16px;
+      border-top: 1px solid var(--border);
+      font-size: 12px;
+      transition: background 0.15s;
+      align-items: center;
+    }
+    .parte-row:hover { background: var(--bg3); }
+    .parte-mec {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--accent);
+    }
+    .parte-hours { font-weight: 500; color: var(--text); text-align: right; }
+    .empty-state { padding: 40px; text-align: center; color: var(--text2); font-size: 12px; }
+
+    @media (max-width: 420px) {
+      .stats-grid { grid-template-columns: 1fr; }
+      .row-2 { grid-template-columns: 1fr; }
+      .partes-header, .parte-row { grid-template-columns: 90px 1fr 60px; }
+      .partes-header span:nth-child(3), .parte-row span:nth-child(3) { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <div class="logo">Taller<span>Track</span></div>
+  <nav class="nav">
+    <button class="nav-btn active" onclick="showView('upload')">+ Parte</button>
+    <button class="nav-btn" onclick="showView('dashboard')">Dashboard</button>
+  </nav>
+</header>
+
+<main class="main">
+
+  <!-- ═══ UPLOAD VIEW ═══ -->
+  <div id="view-upload" class="view active">
+    <div id="upload-zone" class="upload-zone">
+      <input type="file" id="photo-input" accept="image/*" capture="environment" onchange="handlePhoto(this)">
+      <div class="upload-icon">📷</div>
+      <div class="upload-title">Fotografía el Parte</div>
+      <div class="upload-sub">
+        Haz una foto al parte del mecánico<br>
+        La IA extraerá los datos automáticamente
+      </div>
+    </div>
+    <br>
+    <button class="manual-btn" onclick="fillForm({}); showView('review')">
+      ✏️ Rellenar manualmente
+    </button>
+
+    <div id="loading-state" class="loading-state" style="display:none">
+      <div class="spinner"></div>
+      <div class="loading-title">Analizando parte...</div>
+      <div class="loading-sub">Claude está leyendo el documento</div>
+    </div>
+  </div>
+
+  <!-- ═══ REVIEW VIEW ═══ -->
+  <div id="view-review" class="view">
+    <div class="form-section">
+      <div class="section-title">
+        Datos del parte
+        <span class="ai-badge" id="ai-badge" style="display:none">✦ Extraído por IA</span>
+      </div>
+
+      <div class="field">
+        <label>Mecánico</label>
+        <select id="f-mecanico">
+          <option value="">Seleccionar mecánico...</option>
+          <option>Daniel</option>
+          <option>Santi</option>
+          <option>Pedro</option>
+          <option>Nene</option>
+        </select>
+      </div>
+
+      <div class="row-2">
+        <div class="field">
+          <label>Cliente</label>
+          <input type="text" id="f-cliente" placeholder="Nombre del cliente">
+        </div>
+        <div class="field">
+          <label>Matrícula</label>
+          <input type="text" id="f-matricula" placeholder="0000-XXX" style="text-transform:uppercase">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Descripción del trabajo</label>
+        <textarea id="f-descripcion" placeholder="Trabajo realizado..."></textarea>
+      </div>
+
+      <div class="field">
+        <label>Piezas cambiadas</label>
+        <textarea id="f-piezas" placeholder="Filtro de aceite, pastillas freno..." style="min-height:60px"></textarea>
+      </div>
+
+      <div class="field">
+        <label>Horas trabajadas</label>
+        <input type="number" id="f-horas" placeholder="2.5" step="0.5" min="0" max="24">
+      </div>
+    </div>
+
+    <button class="btn-primary" id="btn-guardar" onclick="guardarParte()">
+      ✓ Guardar Parte
+    </button>
+    <br><br>
+    <button class="btn-secondary" style="width:100%" onclick="cancelarFormulario()">
+      ← Cancelar
+    </button>
+  </div>
+
+  <!-- ═══ DASHBOARD VIEW ═══ -->
+  <div id="view-dashboard" class="view">
+    <div class="dashboard-header">
+      <div class="month-label" id="month-label">— <span>—</span></div>
+    </div>
+
+    <div class="stats-grid" id="stats-grid"></div>
+
+    <div class="chart-container">
+      <div class="chart-title">⏱ Horas por mecánico</div>
+      <canvas id="chart-horas" height="180"></canvas>
+    </div>
+
+    <div class="chart-container">
+      <div class="chart-title">📋 Partes realizados</div>
+      <canvas id="chart-partes" height="180"></canvas>
+    </div>
+
+    <div class="section-title" style="margin-bottom:12px">Historial de partes</div>
+    <div class="partes-list" id="partes-list"></div>
+  </div>
+
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+//  CONFIGURACIÓN — pega aquí tu URL de Google Apps Script
+// ============================================================
+const APPS_SCRIPT_URL = 'YOUR_APPS_SCRIPT_URL_AQUI';
+// ============================================================
+
+const MECANICOS = ['Daniel', 'Santi', 'Pedro', 'Nene'];
+const COLORES   = ['#F59E0B', '#D97706', '#B45309', '#92400E'];
+
+let partes      = [];  // almacén en memoria para esta sesión
+let horasChart  = null;
+let partesChart = null;
+let usedAI      = false;
+
+// ── Navegación ─────────────────────────────────────────────
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+  const navBtns = document.querySelectorAll('.nav-btn');
+  if (name === 'upload' || name === 'review') navBtns[0].classList.add('active');
+  if (name === 'dashboard') { navBtns[1].classList.add('active'); renderDashboard(); }
+}
+
+// ── Foto → IA ──────────────────────────────────────────────
+async function handlePhoto(input) {
+  if (!input.files[0]) return;
+  const file = input.files[0];
+
+  document.getElementById('upload-zone').style.display = 'none';
+  document.getElementById('loading-state').style.display = 'block';
+
+  try {
+    const base64    = await fileToBase64(file);
+    const mediaType = file.type || 'image/jpeg';
+    const data      = await extractDataFromImage(base64, mediaType);
+    usedAI = true;
+    fillForm(data);
+    showView('review');
+  } catch (err) {
+    console.error(err);
+    showToast('No se pudo analizar la imagen. Rellena el formulario.', true);
+    usedAI = false;
+    fillForm({});
+    showView('review');
+  } finally {
+    document.getElementById('upload-zone').style.display  = 'block';
+    document.getElementById('loading-state').style.display = 'none';
+    input.value = '';
+  }
+}
+
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload  = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function extractDataFromImage(base64, mediaType) {
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1000,
+      messages: [{
+        role: 'user',
+        content: [
+          {
+            type: 'image',
+            source: { type: 'base64', media_type: mediaType, data: base64 }
+          },
+          {
+            type: 'text',
+            text: `Analiza este parte de taller mecánico y extrae los datos. Los mecánicos del taller son: Daniel, Santi, Pedro y Nene.
+Responde ÚNICAMENTE con un objeto JSON válido, sin markdown ni texto adicional:
+{
+  "mecanico": "nombre del mecánico (uno de: Daniel, Santi, Pedro, Nene) o cadena vacía si no aparece",
+  "cliente": "nombre del cliente o cadena vacía",
+  "matricula": "matrícula del vehículo en mayúsculas o cadena vacía",
+  "descripcion": "descripción del trabajo realizado o cadena vacía",
+  "piezas": "piezas cambiadas separadas por comas o cadena vacía",
+  "horas": número decimal de horas trabajadas (solo el número, ej: 2.5) o 0
+}`
+          }
+        ]
+      }]
+    })
+  });
+
+  const json = await res.json();
+  const text = json.content?.[0]?.text || '{}';
+  return JSON.parse(text.replace(/```json|```/g, '').trim());
+}
+
+// ── Formulario ─────────────────────────────────────────────
+function fillForm(data) {
+  const set = (id, val) => {
+    const el = document.getElementById(id);
+    if (el) el.value = (val !== undefined && val !== null) ? val : '';
+  };
+  set('f-mecanico',   data.mecanico   || '');
+  set('f-cliente',    data.cliente    || '');
+  set('f-matricula',  (data.matricula || '').toUpperCase());
+  set('f-descripcion',data.descripcion|| '');
+  set('f-piezas',     data.piezas     || '');
+  set('f-horas',      data.horas      || '');
+
+  const badge = document.getElementById('ai-badge');
+  badge.style.display = usedAI ? 'inline-block' : 'none';
+}
+
+function cancelarFormulario() {
+  usedAI = false;
+  showView('upload');
+}
+
+async function guardarParte() {
+  const parte = {
+    fecha:       new Date().toLocaleDateString('es-ES'),
+    timestamp:   new Date().toISOString(),
+    mecanico:    document.getElementById('f-mecanico').value,
+    cliente:     document.getElementById('f-cliente').value.trim(),
+    matricula:   document.getElementById('f-matricula').value.trim().toUpperCase(),
+    descripcion: document.getElementById('f-descripcion').value.trim(),
+    piezas:      document.getElementById('f-piezas').value.trim(),
+    horas:       parseFloat(document.getElementById('f-horas').value) || 0
+  };
+
+  if (!parte.mecanico)   { showToast('Selecciona un mecánico', true); return; }
+  if (!parte.matricula)  { showToast('Introduce la matrícula', true); return; }
+  if (!parte.horas)      { showToast('Introduce las horas trabajadas', true); return; }
+
+  const btn = document.getElementById('btn-guardar');
+  btn.disabled    = true;
+  btn.textContent = 'Guardando...';
+
+  // 1. Guardar en memoria local
+  partes.push(parte);
+
+  // 2. Enviar a Google Sheets (no-cors: no podemos leer respuesta, pero los datos llegan)
+  if (APPS_SCRIPT_URL !== 'YOUR_APPS_SCRIPT_URL_AQUI') {
+    try {
+      fetch(APPS_SCRIPT_URL, {
+        method:  'POST',
+        mode:    'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(parte)
+      });
+    } catch(e) { console.warn('Google Sheets no disponible:', e); }
+  }
+
+  // 3. Reset
+  ['f-mecanico','f-cliente','f-matricula','f-descripcion','f-piezas','f-horas']
+    .forEach(id => document.getElementById(id).value = '');
+  usedAI = false;
+  btn.disabled    = false;
+  btn.textContent = '✓ Guardar Parte';
+
+  showToast('✓ Parte guardado — ' + parte.mecanico + ' · ' + parte.matricula);
+  showView('upload');
+}
+
+// ── Dashboard ──────────────────────────────────────────────
+function renderDashboard() {
+  // Cabecera mes
+  const now = new Date();
+  const mes = now.toLocaleString('es-ES', { month: 'long' }).toUpperCase();
+  document.getElementById('month-label').innerHTML =
+    `${mes} <span>${now.getFullYear()}</span>`;
+
+  // Stats por mecánico
+  const stats = {};
+  MECANICOS.forEach(m => stats[m] = { partes: 0, horas: 0 });
+  partes.forEach(p => {
+    if (stats[p.mecanico]) {
+      stats[p.mecanico].partes++;
+      stats[p.mecanico].horas += p.horas;
+    }
+  });
+
+  // Cards
+  document.getElementById('stats-grid').innerHTML = MECANICOS.map((m, i) => `
+    <div class="stat-card" style="--accent:${COLORES[i]}">
+      <div class="stat-name">${m}</div>
+      <div class="stat-row">
+        <span class="stat-label">Partes</span>
+        <span class="stat-value" style="color:${COLORES[i]}">${stats[m].partes}</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Horas</span>
+        <span class="stat-value secondary">${stats[m].horas.toFixed(1)} h</span>
+      </div>
+    </div>
+  `).join('');
+
+  // Gráficas
+  const horasData  = MECANICOS.map(m => stats[m].horas);
+  const partesData = MECANICOS.map(m => stats[m].partes);
+
+  const chartCfg = (data, suffix) => ({
+    type: 'bar',
+    data: {
+      labels: MECANICOS,
+      datasets: [{
+        data,
+        backgroundColor: COLORES,
+        borderRadius: 5,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: { label: ctx => ` ${ctx.raw}${suffix}` },
+          backgroundColor: '#1e1e1e',
+          borderColor: '#333',
+          borderWidth: 1,
+          titleColor: '#F5F5F5',
+          bodyColor: '#F59E0B',
+          titleFont: { family: 'IBM Plex Mono' },
+          bodyFont:  { family: 'IBM Plex Mono' }
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: '#2a2a2a' },
+          ticks: { color: '#A0A0A0', font: { family: 'IBM Plex Mono', size: 12 } }
+        },
+        y: {
+          grid: { color: '#2a2a2a' },
+          ticks: { color: '#A0A0A0', font: { family: 'IBM Plex Mono', size: 11 } },
+          beginAtZero: true
+        }
+      }
+    }
+  });
+
+  if (horasChart)  horasChart.destroy();
+  if (partesChart) partesChart.destroy();
+  horasChart  = new Chart(document.getElementById('chart-horas'),  chartCfg(horasData,  'h'));
+  partesChart = new Chart(document.getElementById('chart-partes'), chartCfg(partesData, ' partes'));
+
+  // Tabla
+  const lista = document.getElementById('partes-list');
+  if (!partes.length) {
+    lista.innerHTML = '<div class="empty-state">No hay partes en esta sesión.<br>Sube una foto para empezar.</div>';
+    return;
+  }
+  lista.innerHTML = `
+    <div class="partes-header">
+      <span>Mecánico</span><span>Matrícula</span><span>Fecha</span><span>Horas</span>
+    </div>
+    ${[...partes].reverse().map(p => `
+      <div class="parte-row">
+        <span class="parte-mec">${p.mecanico}</span>
+        <span style="color:var(--text2);font-size:12px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${p.matricula}</span>
+        <span style="color:var(--text2);font-size:11px">${p.fecha}</span>
+        <span class="parte-hours">${p.horas}h</span>
+      </div>
+    `).join('')}
+  `;
+}
+
+// ── Toast ───────────────────────────────────────────────────
+function showToast(msg, isError = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className   = 'toast' + (isError ? ' error' : '');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3200);
+}
+
+// ── Drag & Drop ─────────────────────────────────────────────
+const zone = document.getElementById('upload-zone');
+zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+zone.addEventListener('dragleave', ()  => zone.classList.remove('drag-over'));
+zone.addEventListener('drop', e => {
+  e.preventDefault();
+  zone.classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) {
+    const inp = document.getElementById('photo-input');
+    const dt  = new DataTransfer();
+    dt.items.add(file);
+    inp.files = dt.files;
+    handlePhoto(inp);
+  }
+});
+</script>
+
+</body>
+</html>
