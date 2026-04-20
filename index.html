@@ -12,535 +12,156 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
   <style>
     :root {
-      --bg:      #141414;
-      --bg2:     #1e1e1e;
-      --bg3:     #2a2a2a;
-      --accent:  #F59E0B;
-      --accent2: #D97706;
-      --text:    #F5F5F5;
-      --text2:   #A0A0A0;
-      --border:  #333;
-      --success: #10B981;
-      --error:   #EF4444;
-      --nav-h:   64px;
+      --bg:       #141414;
+      --bg2:      #1e1e1e;
+      --bg3:      #2a2a2a;
+      --accent:   #F59E0B;
+      --accent2:  #D97706;
+      --text:     #F5F5F5;
+      --text2:    #A0A0A0;
+      --border:   #333;
+      --success:  #10B981;
+      --error:    #EF4444;
+      --warn:     #F59E0B;
+      --nav-h:    64px;
       --header-h: 56px;
     }
-
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
     body {
-      background: var(--bg);
-      color: var(--text);
+      background: var(--bg); color: var(--text);
       font-family: 'IBM Plex Mono', monospace;
-      min-height: 100vh;
-      min-height: -webkit-fill-available;
+      min-height: 100vh; min-height: -webkit-fill-available;
       overscroll-behavior: none;
     }
-
-    /* ── HEADER ── */
     .header {
-      background: var(--bg2);
-      border-bottom: 2px solid var(--accent);
-      padding: 0 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      height: var(--header-h);
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
+      background: var(--bg2); border-bottom: 2px solid var(--accent);
+      padding: 0 16px; display: flex; align-items: center; justify-content: space-between;
+      height: var(--header-h); position: fixed; top: 0; left: 0; right: 0; z-index: 100;
     }
-    .logo {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-weight: 900;
-      font-size: 20px;
-      color: var(--accent);
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      line-height: 1;
-    }
-    .logo small {
-      display: block;
-      font-size: 9px;
-      font-weight: 600;
-      color: var(--text2);
-      letter-spacing: 1.5px;
-      margin-top: 2px;
-    }
-    .header-badge {
-      background: rgba(245,158,11,0.12);
-      border: 1px solid rgba(245,158,11,0.25);
-      color: var(--accent);
-      font-size: 9px;
-      font-family: 'Barlow Condensed', sans-serif;
-      font-weight: 700;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      padding: 4px 10px;
-      border-radius: 20px;
-    }
-
-    /* ── BOTTOM NAV ── */
-    .bottom-nav {
-      position: fixed;
-      bottom: 0; left: 0; right: 0;
-      height: var(--nav-h);
-      background: var(--bg2);
-      border-top: 1px solid var(--border);
-      display: flex;
-      z-index: 100;
-      padding-bottom: env(safe-area-inset-bottom);
-    }
-    .nav-tab {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-      background: none;
-      border: none;
-      color: var(--text2);
-      cursor: pointer;
-      transition: color 0.2s;
-      padding: 8px 0;
-      position: relative;
-    }
+    .logo { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 20px; color: var(--accent); letter-spacing: 2px; text-transform: uppercase; line-height: 1; }
+    .logo small { display: block; font-size: 9px; font-weight: 600; color: var(--text2); letter-spacing: 1.5px; margin-top: 2px; }
+    .header-badge { background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.25); color: var(--accent); font-size: 9px; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; }
+    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: var(--nav-h); background: var(--bg2); border-top: 1px solid var(--border); display: flex; z-index: 100; padding-bottom: env(safe-area-inset-bottom); }
+    .nav-tab { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; background: none; border: none; color: var(--text2); cursor: pointer; transition: color 0.2s; padding: 8px 0; position: relative; }
     .nav-tab.active { color: var(--accent); }
-    .nav-tab.active::after {
-      content: '';
-      position: absolute;
-      top: 0; left: 20%; right: 20%;
-      height: 2px;
-      background: var(--accent);
-      border-radius: 0 0 3px 3px;
-    }
+    .nav-tab.active::after { content: ''; position: absolute; top: 0; left: 20%; right: 20%; height: 2px; background: var(--accent); border-radius: 0 0 3px 3px; }
     .nav-tab svg { width: 22px; height: 22px; }
-    .nav-tab span {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-weight: 700;
-      font-size: 10px;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-    }
-
-    /* ── MAIN ── */
-    .main {
-      padding-top: calc(var(--header-h) + 16px);
-      padding-bottom: calc(var(--nav-h) + 16px);
-      padding-left: 16px;
-      padding-right: 16px;
-      max-width: 520px;
-      margin: 0 auto;
-    }
-
-    /* ── VIEWS ── */
+    .nav-tab span { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; }
+    .main { padding-top: calc(var(--header-h) + 16px); padding-bottom: calc(var(--nav-h) + 16px); padding-left: 16px; padding-right: 16px; max-width: 520px; margin: 0 auto; }
     .view { display: none; }
     .view.active { display: block; }
 
-    /* ── UPLOAD ZONE ── */
-    .camera-btn {
-      width: 100%;
-      background: var(--bg2);
-      border: 2px dashed var(--border);
-      border-radius: 16px;
-      padding: 48px 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-      cursor: pointer;
-      transition: all 0.2s;
-      position: relative;
-      overflow: hidden;
-    }
-    .camera-btn:active {
-      border-color: var(--accent);
-      background: rgba(245,158,11,0.05);
-      transform: scale(0.99);
-    }
-    .camera-btn input[type="file"] {
-      position: absolute;
-      inset: 0;
-      opacity: 0;
-      cursor: pointer;
-      width: 100%;
-      height: 100%;
-    }
-    .camera-icon {
-      width: 72px;
-      height: 72px;
-      background: rgba(245,158,11,0.1);
-      border: 2px solid rgba(245,158,11,0.3);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 32px;
-    }
-    .camera-title {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 22px;
-      font-weight: 700;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-    }
-    .camera-sub {
-      font-size: 11px;
-      color: var(--text2);
-      text-align: center;
-      line-height: 1.6;
-    }
+    /* ── STEPS ── */
+    .steps { display: flex; align-items: center; margin-bottom: 20px; }
+    .step { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 1; }
+    .step-circle { width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 16px; color: var(--text2); background: var(--bg2); transition: all 0.3s; }
+    .step.done .step-circle  { background: var(--success); border-color: var(--success); color: #000; }
+    .step.active .step-circle { background: var(--accent); border-color: var(--accent); color: #000; }
+    .step-label { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--text2); text-align: center; }
+    .step.active .step-label { color: var(--accent); }
+    .step.done .step-label   { color: var(--success); }
+    .step-line { flex: 1; height: 2px; background: var(--border); margin-bottom: 22px; transition: background 0.3s; }
+    .step-line.done { background: var(--success); }
 
-    .divider {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin: 16px 0;
-      color: var(--text2);
-      font-size: 10px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-    }
-    .divider::before, .divider::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: var(--border);
-    }
+    /* ── FOTO CARDS ── */
+    .foto-card { background: var(--bg2); border: 2px solid var(--border); border-radius: 16px; overflow: hidden; margin-bottom: 12px; transition: border-color 0.2s; }
+    .foto-card.done   { border-color: var(--success); }
+    .foto-card.active { border-color: var(--accent); }
+    .foto-card-header { padding: 12px 16px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--border); }
+    .foto-card-num { width: 28px; height: 28px; border-radius: 50%; background: var(--bg3); border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 14px; color: var(--text2); flex-shrink: 0; transition: all 0.3s; }
+    .foto-card.done   .foto-card-num { background: var(--success); border-color: var(--success); color: #000; }
+    .foto-card.active .foto-card-num { background: var(--accent);  border-color: var(--accent);  color: #000; }
+    .foto-card-title { font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; transition: color 0.3s; }
+    .foto-card.done   .foto-card-title { color: var(--success); }
+    .foto-card.active .foto-card-title { color: var(--accent); }
+    .foto-card-sub { font-size: 10px; color: var(--text2); margin-top: 2px; }
+    .foto-card-body { padding: 14px 16px; }
+    .foto-thumb { width: 100%; height: 120px; object-fit: cover; border-radius: 8px; display: none; margin-bottom: 10px; }
+    .foto-thumb.visible { display: block; }
+    .btn-foto { width: 100%; background: rgba(245,158,11,0.08); border: 1px dashed rgba(245,158,11,0.4); border-radius: 10px; color: var(--accent); font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 15px; letter-spacing: 1px; text-transform: uppercase; padding: 14px; cursor: pointer; position: relative; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .btn-foto:active { background: rgba(245,158,11,0.15); }
+    .btn-foto input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+    .btn-foto.done   { background: rgba(16,185,129,0.08); border-color: rgba(16,185,129,0.4); color: var(--success); }
+    .btn-foto.locked { opacity: 0.35; pointer-events: none; }
 
-    .btn-manual {
-      width: 100%;
-      background: none;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      color: var(--text2);
-      font-family: 'Barlow Condensed', sans-serif;
-      font-weight: 700;
-      font-size: 15px;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      padding: 16px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
+    .divider { display: flex; align-items: center; gap: 12px; margin: 16px 0; color: var(--text2); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; }
+    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    .btn-manual { width: 100%; background: none; border: 1px solid var(--border); border-radius: 12px; color: var(--text2); font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 15px; letter-spacing: 1px; text-transform: uppercase; padding: 16px; cursor: pointer; transition: all 0.2s; }
     .btn-manual:active { border-color: var(--text); color: var(--text); }
+    .btn-analizar { width: 100%; background: var(--accent); color: #000; border: none; border-radius: 12px; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 17px; letter-spacing: 2px; text-transform: uppercase; padding: 17px; cursor: pointer; transition: all 0.15s; margin-top: 4px; }
+    .btn-analizar:active { background: var(--accent2); transform: scale(0.98); }
+    .btn-analizar:disabled { opacity: 0.4; pointer-events: none; }
 
     /* ── LOADING ── */
-    .loading-state {
-      display: none;
-      text-align: center;
-      padding: 60px 20px;
-    }
-    .spinner {
-      width: 52px; height: 52px;
-      border: 3px solid var(--border);
-      border-top-color: var(--accent);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin: 0 auto 20px;
-    }
+    .loading-state { display: none; text-align: center; padding: 60px 20px; }
+    .spinner { width: 52px; height: 52px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 20px; }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .loading-title {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 22px;
-      font-weight: 700;
-      color: var(--accent);
-      letter-spacing: 1px;
-    }
-    .loading-sub { font-size: 11px; color: var(--text2); margin-top: 8px; }
+    .loading-title { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 700; color: var(--accent); letter-spacing: 1px; }
+    .loading-steps { margin-top: 16px; display: flex; flex-direction: column; gap: 8px; }
+    .loading-step { font-size: 11px; color: var(--text2); display: flex; align-items: center; gap: 8px; justify-content: center; }
+    .loading-step.active { color: var(--accent); }
+    .loading-step.done   { color: var(--success); }
 
     /* ── FORM ── */
-    .section-label {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--text2);
-      margin-bottom: 14px;
-      padding-bottom: 8px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .ai-badge {
-      display: none;
-      background: rgba(245,158,11,0.15);
-      border: 1px solid rgba(245,158,11,0.3);
-      color: var(--accent);
-      font-size: 9px;
-      padding: 2px 6px;
-      border-radius: 3px;
-    }
-    .field { margin-bottom: 14px; }
-    .field label {
-      display: block;
-      font-size: 10px;
-      color: var(--text2);
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      margin-bottom: 6px;
-    }
-    .field input, .field select, .field textarea {
-      width: 100%;
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      color: var(--text);
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 15px;
-      padding: 13px 14px;
-      transition: border-color 0.2s;
-      outline: none;
-      -webkit-appearance: none;
-      appearance: none;
-    }
-    .field input:focus, .field select:focus, .field textarea:focus {
-      border-color: var(--accent);
-    }
+    .section-label { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--text2); margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
+    .ai-badge { display: none; background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.3); color: var(--accent); font-size: 9px; padding: 2px 6px; border-radius: 3px; }
+    .field { margin-bottom: 14px; position: relative; }
+    .field label { display: flex; align-items: center; gap: 6px; font-size: 10px; color: var(--text2); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; }
+    .field input, .field select, .field textarea { width: 100%; background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; color: var(--text); font-family: 'IBM Plex Mono', monospace; font-size: 15px; padding: 13px 14px; transition: border-color 0.2s, background 0.2s; outline: none; -webkit-appearance: none; appearance: none; }
+    .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--accent); }
     .field textarea { resize: vertical; min-height: 80px; }
     .field select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23A0A0A0' stroke-width='1.5' fill='none'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
     .field select option { background: #1e1e1e; }
     .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-
-    /* ── MECHANIC PILLS ── */
-    .mec-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-bottom: 14px;
-    }
-    .mec-pill {
-      background: var(--bg2);
-      border: 2px solid var(--border);
-      border-radius: 10px;
-      padding: 14px 10px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.15s;
-      font-family: 'Barlow Condensed', sans-serif;
-      font-weight: 700;
-      font-size: 16px;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      color: var(--text2);
-    }
-    .mec-pill.selected {
-      border-color: var(--accent);
-      background: rgba(245,158,11,0.1);
-      color: var(--accent);
-    }
+    .field.uncertain input, .field.uncertain textarea { border-color: var(--warn); background: rgba(245,158,11,0.06); }
+    .uncertain-badge { display: none; font-size: 9px; color: var(--warn); }
+    .field.uncertain .uncertain-badge { display: inline; }
+    .mec-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+    .mec-pill { background: var(--bg2); border: 2px solid var(--border); border-radius: 10px; padding: 14px 10px; text-align: center; cursor: pointer; transition: all 0.15s; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 16px; letter-spacing: 1px; text-transform: uppercase; color: var(--text2); }
+    .mec-pill.selected { border-color: var(--accent); background: rgba(245,158,11,0.1); color: var(--accent); }
+    .mec-pill.uncertain-pill { border-color: var(--warn); background: rgba(245,158,11,0.06); }
     .mec-pill:active { transform: scale(0.97); }
-
-    /* ── BUTTONS ── */
-    .btn-primary {
-      background: var(--accent);
-      color: #000;
-      border: none;
-      font-family: 'Barlow Condensed', sans-serif;
-      font-weight: 700;
-      font-size: 17px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      padding: 17px 32px;
-      border-radius: 12px;
-      cursor: pointer;
-      width: 100%;
-      transition: all 0.15s;
-    }
+    .btn-primary { background: var(--accent); color: #000; border: none; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 17px; letter-spacing: 2px; text-transform: uppercase; padding: 17px 32px; border-radius: 12px; cursor: pointer; width: 100%; transition: all 0.15s; }
     .btn-primary:active { background: var(--accent2); transform: scale(0.98); }
     .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
-    .btn-ghost {
-      background: none;
-      color: var(--text2);
-      border: 1px solid var(--border);
-      font-family: 'Barlow Condensed', sans-serif;
-      font-weight: 600;
-      font-size: 14px;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      padding: 14px 24px;
-      border-radius: 12px;
-      cursor: pointer;
-      width: 100%;
-      transition: all 0.15s;
-      margin-top: 10px;
-    }
+    .btn-ghost { background: none; color: var(--text2); border: 1px solid var(--border); font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 14px; letter-spacing: 1px; text-transform: uppercase; padding: 14px 24px; border-radius: 12px; cursor: pointer; width: 100%; transition: all 0.15s; margin-top: 10px; }
     .btn-ghost:active { border-color: var(--text2); color: var(--text); }
+    .review-warn { display: none; background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.3); border-radius: 10px; padding: 12px 14px; margin-bottom: 16px; font-size: 11px; color: var(--warn); line-height: 1.6; }
+    .review-warn.visible { display: block; }
+    .review-warn strong { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; letter-spacing: 1px; display: block; margin-bottom: 2px; }
 
     /* ── DASHBOARD ── */
-    .dash-header {
-      margin-bottom: 20px;
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-    }
-    .month-label {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 28px;
-      font-weight: 900;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      line-height: 1;
-    }
+    .dash-header { margin-bottom: 20px; display: flex; align-items: flex-end; justify-content: space-between; }
+    .month-label { font-family: 'Barlow Condensed', sans-serif; font-size: 28px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; line-height: 1; }
     .month-label span { color: var(--accent); }
-    .total-chip {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 6px 12px;
-      font-size: 11px;
-      color: var(--text2);
-      text-align: right;
-    }
-    .total-chip strong {
-      display: block;
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 20px;
-      color: var(--accent);
-    }
-
-    .stats-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-    .stat-card {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 14px;
-      position: relative;
-      overflow: hidden;
-    }
-    .stat-card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 3px;
-      background: var(--accent);
-    }
-    .stat-name {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 16px;
-      font-weight: 700;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      margin-bottom: 10px;
-    }
-    .stat-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      margin-bottom: 4px;
-    }
+    .total-chip { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px; font-size: 11px; color: var(--text2); text-align: right; }
+    .total-chip strong { display: block; font-family: 'Barlow Condensed', sans-serif; font-size: 20px; color: var(--accent); }
+    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+    .stat-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 14px; position: relative; overflow: hidden; }
+    .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--accent); }
+    .stat-name { font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; }
+    .stat-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
     .stat-lbl { font-size: 9px; color: var(--text2); letter-spacing: 1px; text-transform: uppercase; }
-    .stat-val {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--accent);
-    }
+    .stat-val { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 700; color: var(--accent); }
     .stat-val.sec { font-size: 16px; color: var(--text); }
-
-    .chart-box {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 16px;
-    }
-    .chart-lbl {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--text2);
-      margin-bottom: 14px;
-    }
-
-    .partes-list {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      overflow: hidden;
-      margin-bottom: 16px;
-    }
-    .partes-hdr {
-      display: grid;
-      grid-template-columns: 90px 1fr 55px;
-      gap: 8px;
-      padding: 10px 14px;
-      background: var(--bg3);
-      font-size: 9px;
-      color: var(--text2);
-      letter-spacing: 1px;
-      text-transform: uppercase;
-    }
-    .parte-row {
-      display: grid;
-      grid-template-columns: 90px 1fr 55px;
-      gap: 8px;
-      padding: 13px 14px;
-      border-top: 1px solid var(--border);
-      align-items: center;
-      transition: background 0.15s;
-    }
-    .parte-row:active { background: var(--bg3); }
-    .parte-mec {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-weight: 700;
-      font-size: 15px;
-      color: var(--accent);
-    }
+    .chart-box { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+    .chart-lbl { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--text2); margin-bottom: 14px; }
+    .partes-list { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 16px; }
+    .partes-hdr { display: grid; grid-template-columns: 90px 1fr 55px; gap: 8px; padding: 10px 14px; background: var(--bg3); font-size: 9px; color: var(--text2); letter-spacing: 1px; text-transform: uppercase; }
+    .parte-row { display: grid; grid-template-columns: 90px 1fr 55px; gap: 8px; padding: 13px 14px; border-top: 1px solid var(--border); align-items: center; }
+    .parte-mec { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 15px; color: var(--accent); }
     .parte-mat { color: var(--text2); font-size: 12px; }
     .parte-hrs { font-weight: 500; color: var(--text); text-align: right; font-size: 13px; }
     .empty-state { padding: 40px 20px; text-align: center; color: var(--text2); font-size: 12px; line-height: 1.8; }
-
-    /* ── SHEET BANNER ── */
-    .sheet-banner {
-      background: rgba(245,158,11,0.08);
-      border: 1px solid rgba(245,158,11,0.2);
-      border-radius: 10px;
-      padding: 14px;
-      margin-bottom: 16px;
-      font-size: 11px;
-      color: var(--text2);
-      line-height: 1.6;
-    }
+    .sheet-banner { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2); border-radius: 10px; padding: 14px; margin-bottom: 16px; font-size: 11px; color: var(--text2); line-height: 1.6; }
     .sheet-banner strong { color: var(--accent); display: block; font-family: 'Barlow Condensed', sans-serif; font-size: 13px; letter-spacing: 1px; margin-bottom: 4px; }
-
-    /* ── TOAST ── */
-    .toast {
-      position: fixed;
-      bottom: calc(var(--nav-h) + 12px);
-      left: 50%;
-      transform: translateX(-50%) translateY(100px);
-      background: var(--success);
-      color: #000;
-      font-family: 'Barlow Condensed', sans-serif;
-      font-weight: 700;
-      font-size: 14px;
-      letter-spacing: 1px;
-      padding: 13px 24px;
-      border-radius: 10px;
-      transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
-      z-index: 200;
-      white-space: nowrap;
-      max-width: calc(100vw - 32px);
-      text-align: center;
-    }
+    .toast { position: fixed; bottom: calc(var(--nav-h) + 12px); left: 50%; transform: translateX(-50%) translateY(100px); background: var(--success); color: #000; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 14px; letter-spacing: 1px; padding: 13px 24px; border-radius: 10px; transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1); z-index: 200; white-space: nowrap; max-width: calc(100vw - 32px); text-align: center; }
     .toast.show { transform: translateX(-50%) translateY(0); }
     .toast.error { background: var(--error); color: #fff; }
   </style>
 </head>
 <body>
 
-<!-- HEADER -->
 <header class="header">
   <div class="logo">
     Electro<span style="color:var(--text2);font-weight:400">Partes</span>
@@ -553,168 +174,176 @@
 
   <!-- ═══ UPLOAD ═══ -->
   <div id="view-upload" class="view active">
-
     <div id="upload-zone">
-      <label class="camera-btn">
-        <input type="file" id="photo-input" accept="image/*" capture="environment" onchange="handlePhoto(this)">
-        <div class="camera-icon">📷</div>
-        <div class="camera-title">Fotografiar parte</div>
-        <div class="camera-sub">
-          Abre la cámara o elige una foto<br>
-          La IA extrae los datos automáticamente
+
+      <div class="steps">
+        <div class="step active" id="step1">
+          <div class="step-circle">1</div>
+          <div class="step-label">Delantera</div>
         </div>
-      </label>
+        <div class="step-line" id="line1"></div>
+        <div class="step" id="step2">
+          <div class="step-circle">2</div>
+          <div class="step-label">Trasera</div>
+        </div>
+        <div class="step-line" id="line2"></div>
+        <div class="step" id="step3">
+          <div class="step-circle">✓</div>
+          <div class="step-label">Analizar</div>
+        </div>
+      </div>
 
-      <div class="divider">o</div>
+      <div class="foto-card active" id="card1">
+        <div class="foto-card-header">
+          <div class="foto-card-num">1</div>
+          <div class="foto-card-info">
+            <div class="foto-card-title">Cara delantera</div>
+            <div class="foto-card-sub">Marca · Modelo · Matrícula · Trabajo a realizar</div>
+          </div>
+        </div>
+        <div class="foto-card-body">
+          <img id="thumb1" class="foto-thumb" src="" alt="">
+          <label class="btn-foto" id="btn-foto1">
+            <input type="file" id="input-foto1" accept="image/*" capture="environment" onchange="onFoto(1,this)">
+            📷 Hacer foto
+          </label>
+        </div>
+      </div>
 
-      <button class="btn-manual" onclick="fillForm({}); showView('review')">
-        ✏️ Rellenar a mano
+      <div class="foto-card" id="card2">
+        <div class="foto-card-header">
+          <div class="foto-card-num">2</div>
+          <div class="foto-card-info">
+            <div class="foto-card-title">Cara trasera</div>
+            <div class="foto-card-sub">Trabajo realizado · Horas</div>
+          </div>
+        </div>
+        <div class="foto-card-body">
+          <img id="thumb2" class="foto-thumb" src="" alt="">
+          <label class="btn-foto locked" id="btn-foto2">
+            <input type="file" id="input-foto2" accept="image/*" capture="environment" onchange="onFoto(2,this)" disabled>
+            📷 Hacer foto
+          </label>
+        </div>
+      </div>
+
+      <button class="btn-analizar" id="btn-analizar" onclick="analizarAmbas()" disabled>
+        ✦ Analizar partes
       </button>
+      <div class="divider">o</div>
+      <button class="btn-manual" onclick="fillForm({}); showView('review')">✏️ Rellenar a mano</button>
+
     </div>
 
     <div id="loading-state" class="loading-state">
       <div class="spinner"></div>
-      <div class="loading-title">Analizando parte...</div>
-      <div class="loading-sub">La IA está leyendo el documento</div>
+      <div class="loading-title">Analizando partes...</div>
+      <div class="loading-steps">
+        <div class="loading-step" id="ls1">📄 Leyendo cara delantera...</div>
+        <div class="loading-step" id="ls2">📄 Leyendo cara trasera...</div>
+        <div class="loading-step" id="ls3">🔍 Combinando datos...</div>
+      </div>
     </div>
-
   </div>
 
   <!-- ═══ REVIEW ═══ -->
   <div id="view-review" class="view">
+    <div class="review-warn" id="review-warn">
+      <strong>⚠ Revisa los campos marcados</strong>
+      La IA no estaba segura de estos datos. Compruébalos antes de guardar.
+    </div>
 
     <div class="section-label">
-      Mecánico
-      <span class="ai-badge" id="ai-badge">✦ IA</span>
+      Mecánico <span class="ai-badge" id="ai-badge">✦ IA</span>
     </div>
-    <div class="mec-grid" id="mec-grid">
-      <!-- generado por JS -->
-    </div>
+    <div class="mec-grid" id="mec-grid"></div>
     <input type="hidden" id="f-mecanico">
 
     <div class="section-label" style="margin-top:4px">Datos del vehículo</div>
-
     <div class="row-2">
-      <div class="field">
-        <label>Cliente</label>
+      <div class="field" id="field-cliente">
+        <label>Cliente <span class="uncertain-badge">⚠ revisar</span></label>
         <input type="text" id="f-cliente" placeholder="Nombre">
       </div>
-      <div class="field">
-        <label>Matrícula</label>
+      <div class="field" id="field-matricula">
+        <label>Matrícula <span class="uncertain-badge">⚠ revisar</span></label>
         <input type="text" id="f-matricula" placeholder="0000-XXX" style="text-transform:uppercase" autocomplete="off">
       </div>
     </div>
-
-    <div class="field">
-      <label>Trabajo realizado</label>
+    <div class="field" id="field-descripcion">
+      <label>Trabajo realizado <span class="uncertain-badge">⚠ revisar</span></label>
       <textarea id="f-descripcion" placeholder="Describe el trabajo..."></textarea>
     </div>
-
-    <div class="field">
-      <label>Piezas cambiadas</label>
+    <div class="field" id="field-piezas">
+      <label>Piezas cambiadas <span class="uncertain-badge">⚠ revisar</span></label>
       <textarea id="f-piezas" placeholder="Filtro aceite, pastillas freno..." style="min-height:60px"></textarea>
     </div>
-
-    <div class="field">
-      <label>Horas trabajadas</label>
+    <div class="field" id="field-horas">
+      <label>Horas trabajadas <span class="uncertain-badge">⚠ revisar</span></label>
       <input type="number" id="f-horas" placeholder="2.5" step="0.5" min="0" max="24" inputmode="decimal">
     </div>
 
     <button class="btn-primary" id="btn-guardar" onclick="guardarParte()">✓ Guardar Parte</button>
     <button class="btn-ghost" onclick="cancelar()">← Cancelar</button>
-
   </div>
 
   <!-- ═══ DASHBOARD ═══ -->
   <div id="view-dashboard" class="view">
-
     <div class="dash-header">
       <div class="month-label" id="month-label">— <span>—</span></div>
-      <div class="total-chip">
-        Partes totales
-        <strong id="total-partes">0</strong>
-      </div>
+      <div class="total-chip">Partes totales<strong id="total-partes">0</strong></div>
     </div>
-
-    <!-- Banner Sheets si no está configurado -->
     <div class="sheet-banner" id="sheets-banner" style="display:none">
-      <strong>⚠ Google Sheets no configurado</strong>
-      Los datos se guardan solo en esta sesión. Sigue las instrucciones en el README para activar la sincronización.
+      <strong>⚠ Google Sheets no configurado</strong>Los datos se guardan solo en esta sesión.
     </div>
-
     <div class="stats-grid" id="stats-grid"></div>
-
     <div class="chart-box">
       <div class="chart-lbl">⏱ Horas por mecánico</div>
       <canvas id="chart-horas" height="160"></canvas>
     </div>
-
     <div class="chart-box">
       <div class="chart-lbl">📋 Partes realizados</div>
       <canvas id="chart-partes" height="160"></canvas>
     </div>
-
     <div class="section-label">Historial</div>
     <div class="partes-list" id="partes-list"></div>
-
   </div>
 
 </main>
 
-<!-- BOTTOM NAV -->
 <nav class="bottom-nav">
   <button class="nav-tab active" id="tab-upload" onclick="showView('upload')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <circle cx="12" cy="12" r="10"/>
-      <line x1="12" y1="8" x2="12" y2="16"/>
-      <line x1="8" y1="12" x2="16" y2="12"/>
-    </svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
     <span>Nuevo Parte</span>
   </button>
   <button class="nav-tab" id="tab-dashboard" onclick="showView('dashboard')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <rect x="3" y="3" width="7" height="7" rx="1"/>
-      <rect x="14" y="3" width="7" height="7" rx="1"/>
-      <rect x="3" y="14" width="7" height="7" rx="1"/>
-      <rect x="14" y="14" width="7" height="7" rx="1"/>
-    </svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
     <span>Dashboard</span>
   </button>
 </nav>
-
 <div class="toast" id="toast"></div>
 
 <script>
-// ============================================================
-//  CONFIGURACIÓN — Pega aquí tu Apps Script URL
-//  (ver instrucciones en README o pregunta a Samuel de NEXO)
-// ============================================================
-const APPS_SCRIPT_URL = 'YOUR_APPS_SCRIPT_URL_AQUI';
-// ============================================================
-
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxPjMq3w9LutjYBXdiFELeCD-M9C_5-GwoP5gZM5MsfLiRDkYZfyiwAwhHrPklV_Efu/exec';
 const MECANICOS = ['Daniel', 'Santi', 'Pedro', 'Nene'];
 const COLORES   = ['#F59E0B', '#D97706', '#B45309', '#10B981'];
 
-let partes      = [];
-let horasChart  = null;
-let partesChart = null;
-let usedAI      = false;
-let mecSelected = '';
+let partes = [], horasChart = null, partesChart = null, usedAI = false;
+let foto1 = null, foto2 = null;
 
-// ── Mecánico pills ─────────────────────────────────────────
+// ── Pills mecánico ─────────────────────────────────────────
 function buildMecGrid() {
-  const grid = document.getElementById('mec-grid');
-  grid.innerHTML = MECANICOS.map(m => `
-    <button class="mec-pill" onclick="selectMec('${m}')">${m}</button>
-  `).join('');
+  document.getElementById('mec-grid').innerHTML = MECANICOS.map(m =>
+    `<button class="mec-pill" onclick="selectMec('${m}')">${m}</button>`
+  ).join('');
 }
 buildMecGrid();
 
 function selectMec(name) {
-  mecSelected = name;
   document.getElementById('f-mecanico').value = name;
   document.querySelectorAll('.mec-pill').forEach(p => {
     p.classList.toggle('selected', p.textContent === name);
+    p.classList.remove('uncertain-pill');
   });
 }
 
@@ -723,253 +352,255 @@ function showView(name) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
   document.getElementById('view-' + name).classList.add('active');
-  if (name === 'upload' || name === 'review') {
-    document.getElementById('tab-upload').classList.add('active');
-  }
-  if (name === 'dashboard') {
-    document.getElementById('tab-dashboard').classList.add('active');
-    renderDashboard();
-  }
+  if (name === 'upload' || name === 'review') document.getElementById('tab-upload').classList.add('active');
+  if (name === 'dashboard') { document.getElementById('tab-dashboard').classList.add('active'); renderDashboard(); }
 }
 
-// ── Foto → IA ──────────────────────────────────────────────
-async function handlePhoto(input) {
+// ── Flujo dos fotos ────────────────────────────────────────
+function updateStepUI() {
+  const setState = (stepId, lineId, cardId, btnId, inputId, isDone, isActive) => {
+    document.getElementById(stepId).className = 'step' + (isDone ? ' done' : isActive ? ' active' : '');
+    if (lineId)  document.getElementById(lineId).className = 'step-line' + (isDone ? ' done' : '');
+    if (cardId)  document.getElementById(cardId).className = 'foto-card' + (isDone ? ' done' : isActive ? ' active' : '');
+    if (btnId && inputId) {
+      const btn = document.getElementById(btnId), inp = document.getElementById(inputId);
+      if (foto1) { btn.classList.remove('locked'); inp.disabled = false; }
+    }
+  };
+  setState('step1', 'line1', 'card1', null, null, !!foto1, !foto1);
+  setState('step2', 'line2', 'card2', 'btn-foto2', 'input-foto2', !!foto2, !!foto1 && !foto2);
+  setState('step3', null,   null,    null, null,    false,  !!(foto1 && foto2));
+
+  const btn = document.getElementById('btn-analizar');
+  btn.disabled = !foto1;
+  btn.textContent = (foto1 && foto2) ? '✦ Analizar ambas caras' : foto1 ? '✦ Analizar (solo delantera)' : '✦ Analizar partes';
+}
+
+async function onFoto(num, input) {
   if (!input.files[0]) return;
   const file = input.files[0];
+  const base64 = await fileToBase64(file);
+  const mediaType = file.type || 'image/jpeg';
+  const data = { base64, mediaType };
 
+  const thumb = document.getElementById('thumb' + num);
+  thumb.src = 'data:' + mediaType + ';base64,' + base64;
+  thumb.classList.add('visible');
+
+  const btn = document.getElementById('btn-foto' + num);
+  btn.classList.add('done');
+  // Reemplazar el texto del nodo
+  Array.from(btn.childNodes).forEach(n => { if (n.nodeType === 3) n.textContent = ' ✓ Foto tomada'; });
+
+  if (num === 1) foto1 = data; else foto2 = data;
+  updateStepUI();
+  input.value = '';
+}
+
+function setLoadingStep(n) {
+  ['ls1','ls2','ls3'].forEach((id, i) => {
+    document.getElementById(id).className = 'loading-step' + (i+1 === n ? ' active' : i+1 < n ? ' done' : '');
+  });
+}
+
+async function analizarAmbas() {
   document.getElementById('upload-zone').style.display = 'none';
   document.getElementById('loading-state').style.display = 'block';
 
   try {
-    const base64    = await fileToBase64(file);
-    const mediaType = file.type || 'image/jpeg';
-    const data      = await extractDataFromImage(base64, mediaType);
+    let data = {};
+    if (foto1 && foto2) {
+      setLoadingStep(1);
+      const [r1, r2] = await Promise.all([analizarFoto(foto1, false), analizarFoto(foto2, true)]);
+      setLoadingStep(3);
+      data = combinar(r1, r2);
+    } else {
+      setLoadingStep(1);
+      data = await analizarFoto(foto1, false);
+      setLoadingStep(3);
+    }
     usedAI = true;
     fillForm(data);
     showView('review');
-  } catch (err) {
+  } catch(err) {
     console.error(err);
-    showToast('No se pudo analizar. Rellena manualmente.', true);
-    usedAI = false;
-    fillForm({});
-    showView('review');
+    showToast('Error al analizar. Rellena manualmente.', true);
+    usedAI = false; fillForm({}); showView('review');
   } finally {
     document.getElementById('upload-zone').style.display = 'block';
     document.getElementById('loading-state').style.display = 'none';
-    input.value = '';
   }
 }
 
-function fileToBase64(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload  = () => resolve(reader.result.split(',')[1]);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
+function combinar(r1, r2) {
+  const c1 = r1._conf || {}, c2 = r2._conf || {};
+  const mejor = (v1, v2, f1, f2) => {
+    // Prefiere el valor con confianza high; si empatan, usa el primero que no esté vacío
+    if (f1 === 'high' && v1) return { v: v1, c: 'high' };
+    if (f2 === 'high' && v2) return { v: v2, c: 'high' };
+    return { v: v1 || v2, c: 'low' };
+  };
+  const mec   = mejor(r1.mecanico,    r2.mecanico,    c1.mecanico,    c2.mecanico);
+  const cli   = mejor(r1.cliente,     r2.cliente,     c1.cliente,     c2.cliente);
+  const mat   = mejor(r1.matricula,   r2.matricula,   c1.matricula,   c2.matricula);
+  // Para trasera tiene prioridad para descripción y horas
+  const desc  = mejor(r2.descripcion, r1.descripcion, c2.descripcion, c1.descripcion);
+  const pie   = mejor(r2.piezas,      r1.piezas,      c2.piezas,      c1.piezas);
+  const hrs   = mejor(r2.horas||0,    r1.horas||0,    c2.horas,       c1.horas);
+  return {
+    mecanico: mec.v, cliente: cli.v, matricula: mat.v,
+    descripcion: desc.v, piezas: pie.v, horas: hrs.v,
+    _conf: { mecanico: mec.c, cliente: cli.c, matricula: mat.c, descripcion: desc.c, piezas: pie.c, horas: hrs.c }
+  };
 }
 
-async function extractDataFromImage(base64, mediaType) {
+async function analizarFoto(foto, esTrasera) {
+  const prompt = esTrasera
+    ? `CARA TRASERA de un parte de taller electromecánico con letra manuscrita (puede ser difícil de leer).
+Los mecánicos son: Daniel, Santi, Pedro, Nene — cada uno con letra diferente.
+Extrae: trabajo realizado, piezas y horas. Para cada campo indica confianza (high/low).
+Responde SOLO con JSON válido sin markdown ni explicaciones:
+{"mecanico":"","cliente":"","matricula":"","descripcion":"trabajo realizado o vacío","piezas":"piezas por comas o vacío","horas":0,"_conf":{"mecanico":"high","cliente":"high","matricula":"high","descripcion":"high o low","piezas":"high o low","horas":"high o low"}}`
+    : `CARA DELANTERA de un parte de taller electromecánico con letra manuscrita (puede ser difícil de leer).
+Los mecánicos son: Daniel, Santi, Pedro, Nene — cada uno con letra diferente.
+Extrae: mecánico, cliente, matrícula, trabajo a realizar. Para cada campo indica confianza (high/low).
+Responde SOLO con JSON válido sin markdown ni explicaciones:
+{"mecanico":"uno de: Daniel/Santi/Pedro/Nene o vacío","cliente":"nombre o vacío","matricula":"matrícula mayúsculas o vacío","descripcion":"trabajo a realizar o vacío","piezas":"","horas":0,"_conf":{"mecanico":"high o low","cliente":"high o low","matricula":"high o low","descripcion":"high o low","piezas":"high","horas":"high"}}`;
+
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       model: 'claude-sonnet-4-20250514',
-      max_tokens: 1000,
-      messages: [{
-        role: 'user',
-        content: [
-          {
-            type: 'image',
-            source: { type: 'base64', media_type: mediaType, data: base64 }
-          },
-          {
-            type: 'text',
-            text: `Analiza este parte de taller electromecánico y extrae los datos. Los mecánicos son: Daniel, Santi, Pedro y Nene.
-Responde ÚNICAMENTE con un objeto JSON válido, sin markdown ni texto adicional:
-{
-  "mecanico": "nombre del mecánico (uno de: Daniel, Santi, Pedro, Nene) o cadena vacía si no aparece",
-  "cliente": "nombre del cliente o cadena vacía",
-  "matricula": "matrícula del vehículo en mayúsculas o cadena vacía",
-  "descripcion": "descripción del trabajo realizado o cadena vacía",
-  "piezas": "piezas cambiadas separadas por comas o cadena vacía",
-  "horas": número decimal de horas trabajadas (solo el número, ej: 2.5) o 0
-}`
-          }
-        ]
-      }]
+      max_tokens: 800,
+      messages: [{ role: 'user', content: [
+        { type: 'image', source: { type: 'base64', media_type: foto.mediaType, data: foto.base64 } },
+        { type: 'text', text: prompt }
+      ]}]
     })
   });
   const json = await res.json();
   const text = json.content?.[0]?.text || '{}';
-  return JSON.parse(text.replace(/```json|```/g, '').trim());
+  return JSON.parse(text.replace(/```json|```/g,'').trim());
 }
 
 // ── Formulario ─────────────────────────────────────────────
 function fillForm(data) {
+  const conf = data._conf || {};
+  const low = f => conf[f] === 'low';
+
   const mec = data.mecanico || '';
   if (mec) selectMec(mec);
-  else {
-    mecSelected = '';
-    document.querySelectorAll('.mec-pill').forEach(p => p.classList.remove('selected'));
-  }
-  const set = (id, val) => {
-    const el = document.getElementById(id);
-    if (el) el.value = (val !== undefined && val !== null) ? val : '';
-  };
-  set('f-cliente',     data.cliente    || '');
-  set('f-matricula',   (data.matricula || '').toUpperCase());
-  set('f-descripcion', data.descripcion|| '');
-  set('f-piezas',      data.piezas     || '');
-  set('f-horas',       data.horas      || '');
+  else document.querySelectorAll('.mec-pill').forEach(p => p.classList.remove('selected'));
+  if (low('mecanico')) document.querySelectorAll('.mec-pill').forEach(p => p.classList.add('uncertain-pill'));
+
+  ['cliente','matricula','descripcion','piezas','horas'].forEach(c => {
+    const el = document.getElementById('f-' + c);
+    let v = data[c] !== undefined && data[c] !== null ? data[c] : '';
+    if (c === 'matricula') v = String(v).toUpperCase();
+    if (el) el.value = v;
+    document.getElementById('field-' + c)?.classList.toggle('uncertain', low(c));
+  });
+
   document.getElementById('ai-badge').style.display = usedAI ? 'inline-block' : 'none';
+  const hayDudosos = usedAI && Object.values(conf).some(v => v === 'low');
+  document.getElementById('review-warn').classList.toggle('visible', hayDudosos);
 }
 
 function cancelar() {
-  usedAI = false;
-  mecSelected = '';
-  document.querySelectorAll('.mec-pill').forEach(p => p.classList.remove('selected'));
+  usedAI = false; foto1 = null; foto2 = null;
+  ['1','2'].forEach(n => {
+    const t = document.getElementById('thumb' + n);
+    t.src = ''; t.classList.remove('visible');
+    const btn = document.getElementById('btn-foto' + n);
+    btn.classList.remove('done');
+    Array.from(btn.childNodes).forEach(node => { if (node.nodeType === 3) node.textContent = ' Hacer foto'; });
+  });
+  document.getElementById('btn-foto2').classList.add('locked');
+  document.getElementById('input-foto2').disabled = true;
+  document.querySelectorAll('.mec-pill').forEach(p => p.classList.remove('selected','uncertain-pill'));
+  ['cliente','matricula','descripcion','piezas','horas'].forEach(c =>
+    document.getElementById('field-' + c)?.classList.remove('uncertain'));
+  document.getElementById('review-warn').classList.remove('visible');
+  updateStepUI();
   showView('upload');
 }
 
 async function guardarParte() {
-  const mecanico = document.getElementById('f-mecanico').value;
-  if (!mecanico)   { showToast('Selecciona un mecánico', true); return; }
+  const mecanico  = document.getElementById('f-mecanico').value;
   const matricula = document.getElementById('f-matricula').value.trim().toUpperCase();
-  if (!matricula)  { showToast('Introduce la matrícula', true); return; }
-  const horas = parseFloat(document.getElementById('f-horas').value) || 0;
-  if (!horas)      { showToast('Introduce las horas trabajadas', true); return; }
+  const horas     = parseFloat(document.getElementById('f-horas').value) || 0;
+  if (!mecanico)  { showToast('Selecciona un mecánico', true); return; }
+  if (!matricula) { showToast('Introduce la matrícula', true); return; }
+  if (!horas)     { showToast('Introduce las horas trabajadas', true); return; }
 
   const parte = {
-    fecha:       new Date().toLocaleDateString('es-ES'),
-    timestamp:   new Date().toISOString(),
-    mecanico,
+    fecha: new Date().toLocaleDateString('es-ES'), timestamp: new Date().toISOString(),
+    mecanico, matricula, horas,
     cliente:     document.getElementById('f-cliente').value.trim(),
-    matricula,
     descripcion: document.getElementById('f-descripcion').value.trim(),
     piezas:      document.getElementById('f-piezas').value.trim(),
-    horas
   };
 
   const btn = document.getElementById('btn-guardar');
-  btn.disabled    = true;
-  btn.textContent = 'Guardando...';
-
+  btn.disabled = true; btn.textContent = 'Guardando...';
   partes.push(parte);
 
-  // Enviar a Google Sheets
-  if (APPS_SCRIPT_URL !== 'YOUR_APPS_SCRIPT_URL_AQUI') {
-    try {
-      fetch(APPS_SCRIPT_URL, {
-        method:  'POST',
-        mode:    'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify(parte)
-      });
-    } catch(e) { console.warn('Google Sheets no disponible:', e); }
-  }
+  try {
+    fetch(APPS_SCRIPT_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body: JSON.stringify(parte) });
+  } catch(e) {}
 
-  // Reset
-  ['f-cliente','f-matricula','f-descripcion','f-piezas','f-horas']
-    .forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
-  mecSelected = '';
-  document.querySelectorAll('.mec-pill').forEach(p => p.classList.remove('selected'));
-  usedAI = false;
-  btn.disabled    = false;
-  btn.textContent = '✓ Guardar Parte';
-
+  btn.disabled = false; btn.textContent = '✓ Guardar Parte';
   showToast('✓ Guardado — ' + mecanico + ' · ' + matricula);
-  showView('upload');
+  cancelar();
 }
 
 // ── Dashboard ──────────────────────────────────────────────
 function renderDashboard() {
   const now = new Date();
-  const mes = now.toLocaleString('es-ES', { month: 'long' }).toUpperCase();
-  document.getElementById('month-label').innerHTML = `${mes} <span>${now.getFullYear()}</span>`;
+  document.getElementById('month-label').innerHTML = `${now.toLocaleString('es-ES',{month:'long'}).toUpperCase()} <span>${now.getFullYear()}</span>`;
   document.getElementById('total-partes').textContent = partes.length;
-
-  const sheetOk = APPS_SCRIPT_URL !== 'YOUR_APPS_SCRIPT_URL_AQUI';
-  document.getElementById('sheets-banner').style.display = sheetOk ? 'none' : 'block';
+  document.getElementById('sheets-banner').style.display = 'none';
 
   const stats = {};
-  MECANICOS.forEach(m => stats[m] = { partes: 0, horas: 0 });
-  partes.forEach(p => {
-    if (stats[p.mecanico]) {
-      stats[p.mecanico].partes++;
-      stats[p.mecanico].horas += p.horas;
-    }
-  });
+  MECANICOS.forEach(m => stats[m] = { partes:0, horas:0 });
+  partes.forEach(p => { if (stats[p.mecanico]) { stats[p.mecanico].partes++; stats[p.mecanico].horas += p.horas; } });
 
-  document.getElementById('stats-grid').innerHTML = MECANICOS.map((m, i) => `
+  document.getElementById('stats-grid').innerHTML = MECANICOS.map((m,i) => `
     <div class="stat-card" style="--accent:${COLORES[i]}">
       <div class="stat-name" style="color:${COLORES[i]}">${m}</div>
-      <div class="stat-row">
-        <span class="stat-lbl">Partes</span>
-        <span class="stat-val" style="color:${COLORES[i]}">${stats[m].partes}</span>
-      </div>
-      <div class="stat-row">
-        <span class="stat-lbl">Horas</span>
-        <span class="stat-val sec">${stats[m].horas.toFixed(1)}h</span>
-      </div>
-    </div>
-  `).join('');
+      <div class="stat-row"><span class="stat-lbl">Partes</span><span class="stat-val" style="color:${COLORES[i]}">${stats[m].partes}</span></div>
+      <div class="stat-row"><span class="stat-lbl">Horas</span><span class="stat-val sec">${stats[m].horas.toFixed(1)}h</span></div>
+    </div>`).join('');
 
-  const chartCfg = (data, suffix) => ({
-    type: 'bar',
-    data: {
-      labels: MECANICOS,
-      datasets: [{ data, backgroundColor: COLORES, borderRadius: 6, borderSkipped: false }]
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          callbacks: { label: ctx => ` ${ctx.raw}${suffix}` },
-          backgroundColor: '#1e1e1e', borderColor: '#333', borderWidth: 1,
-          titleColor: '#F5F5F5', bodyColor: '#F59E0B',
-          titleFont: { family: 'IBM Plex Mono' }, bodyFont: { family: 'IBM Plex Mono' }
-        }
-      },
-      scales: {
-        x: { grid: { color: '#2a2a2a' }, ticks: { color: '#A0A0A0', font: { family: 'IBM Plex Mono', size: 11 } } },
-        y: { grid: { color: '#2a2a2a' }, ticks: { color: '#A0A0A0', font: { family: 'IBM Plex Mono', size: 10 } }, beginAtZero: true }
-      }
-    }
+  const cfg = (data, suf) => ({
+    type:'bar', data:{ labels:MECANICOS, datasets:[{ data, backgroundColor:COLORES, borderRadius:6, borderSkipped:false }] },
+    options:{ responsive:true, plugins:{ legend:{display:false}, tooltip:{ callbacks:{label:c=>` ${c.raw}${suf}`}, backgroundColor:'#1e1e1e', borderColor:'#333', borderWidth:1, titleColor:'#F5F5F5', bodyColor:'#F59E0B', titleFont:{family:'IBM Plex Mono'}, bodyFont:{family:'IBM Plex Mono'} } },
+    scales:{ x:{grid:{color:'#2a2a2a'},ticks:{color:'#A0A0A0',font:{family:'IBM Plex Mono',size:11}}}, y:{grid:{color:'#2a2a2a'},ticks:{color:'#A0A0A0',font:{family:'IBM Plex Mono',size:10}},beginAtZero:true} } }
   });
-
   if (horasChart)  horasChart.destroy();
   if (partesChart) partesChart.destroy();
-  horasChart  = new Chart(document.getElementById('chart-horas'),  chartCfg(MECANICOS.map(m => stats[m].horas),  'h'));
-  partesChart = new Chart(document.getElementById('chart-partes'), chartCfg(MECANICOS.map(m => stats[m].partes), ' partes'));
+  horasChart  = new Chart(document.getElementById('chart-horas'),  cfg(MECANICOS.map(m=>stats[m].horas),'h'));
+  partesChart = new Chart(document.getElementById('chart-partes'), cfg(MECANICOS.map(m=>stats[m].partes),' partes'));
 
   const lista = document.getElementById('partes-list');
-  if (!partes.length) {
-    lista.innerHTML = '<div class="empty-state">Sin partes esta sesión.<br>Haz una foto para empezar. 📷</div>';
-    return;
-  }
-  lista.innerHTML = `
-    <div class="partes-hdr"><span>Mecánico</span><span>Matrícula</span><span style="text-align:right">Horas</span></div>
-    ${[...partes].reverse().map(p => `
-      <div class="parte-row">
-        <span class="parte-mec">${p.mecanico}</span>
-        <span class="parte-mat">${p.matricula}</span>
-        <span class="parte-hrs">${p.horas}h</span>
-      </div>
-    `).join('')}
-  `;
+  lista.innerHTML = !partes.length
+    ? '<div class="empty-state">Sin partes esta sesión.<br>Haz fotos para empezar. 📷</div>'
+    : `<div class="partes-hdr"><span>Mecánico</span><span>Matrícula</span><span style="text-align:right">Horas</span></div>
+      ${[...partes].reverse().map(p=>`<div class="parte-row"><span class="parte-mec">${p.mecanico}</span><span class="parte-mat">${p.matricula}</span><span class="parte-hrs">${p.horas}h</span></div>`).join('')}`;
 }
 
-// ── Toast ───────────────────────────────────────────────────
-function showToast(msg, isError = false) {
+// ── Utils ──────────────────────────────────────────────────
+function fileToBase64(file) {
+  return new Promise((res,rej) => { const r=new FileReader(); r.onload=()=>res(r.result.split(',')[1]); r.onerror=rej; r.readAsDataURL(file); });
+}
+function showToast(msg, isError=false) {
   const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className   = 'toast' + (isError ? ' error' : '');
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 3200);
+  t.textContent = msg; t.className = 'toast'+(isError?' error':'');
+  t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 3200);
 }
-</script>
 
+updateStepUI();
+</script>
 </body>
 </html>
